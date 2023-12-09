@@ -1,8 +1,10 @@
-// cl /std:c++17 /nologo /Zi win32-d3d11.cpp
-
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <windows.h>
+#include <stdio.h>
+#include "../types.cpp"
+#include "windows_platform.cpp"
+#include "../common.cpp"
 
 #pragma comment(lib, "user32")
 #pragma comment(lib, "d3d11")
@@ -15,6 +17,12 @@ LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
   default:
     return DefWindowProc(hwnd, msg, wparam, lparam);
   }
+}
+int custom_func(int i) {
+    int idx = (i) % 5;
+    int val[] = {555,3332,1434,4543,3435};
+    int res = val[idx];
+    return res;
 }
 
 int main() {

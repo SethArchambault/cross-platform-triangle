@@ -1,12 +1,9 @@
-#if 0
-    /usr/bin/clang++ -std=c++11 build.cpp -g -fsanitize=address -O0 -o temp/build && 
-    ./temp/build $*
-    rm temp/build 
-    exit
-#endif
+//usr/bin/clang++ -std=c++11 build.cpp -g -fsanitize=address -O0 -o temp/build && ./temp/build $* && rm temp/build; exit;
 
 #include<stdio.h>
 #include <stdlib.h>
+#include "../common.h"
+#include "../macos_platform.cpp"
 #include "../common.cpp"
 
 enum {
@@ -51,6 +48,8 @@ S32 command_run(Arena *arena, S32 mode)
         cmd = string_concat(arena, cmd, "Before running ./build.cpp, run:\n"); 
         cmd = string_concat(arena, cmd, "emsdk\n"); 
         cmd = string_concat(arena, cmd, "   This runs emsdk, to make emcc available. Run once.\n"); 
+        cmd = string_concat(arena, cmd, "./build.cpp server\n"); 
+        cmd = string_concat(arena, cmd, "   Run the wasm server\n"); 
         string_print(cmd);
         return 0;
     }

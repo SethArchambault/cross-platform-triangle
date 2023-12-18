@@ -1,8 +1,10 @@
-///usr/bin/clang++ build.cpp -g -fsanitize=address -O0 -o temp/build && ./temp/build $*; rm temp/build; exit
+//usr/bin/clang++ build.cpp -g -fsanitize=address -O0 -o temp/build && ./temp/build $* && rm temp/build; exit; 
 
 #include<stdio.h>
 #include <stdlib.h>
+#include "../common.h"
 #include "../common.cpp"
+#include "../macos_platform.cpp"
 
 enum {
     mode_none       = 0x0, 
@@ -49,8 +51,6 @@ S32 command_run(Arena *arena, S32 modes, String* device_name)
 {
     String * cmd = string_make(arena, "");
 
-    cmd = string_concat(arena, cmd, 
-            "xcodebuild -workspace IosMetalTriangle.xcworkspace -configuration Debug -scheme 01-primitive ");
     if (modes & mode_help) {
         cmd = string_concat(arena, cmd, "\nOptions:\n"); 
         cmd = string_concat(arena, cmd, "./build.cpp list\n"); 
@@ -58,10 +58,12 @@ S32 command_run(Arena *arena, S32 modes, String* device_name)
         string_print(cmd);
         return 0;
     }
+    cmd = string_concat(arena, cmd, 
+            "xcodebuild -workspace IosMetalTriangle.xcworkspace -configuration Debug -scheme 01-primitive ");
     if (modes & mode_list) {
         cmd = string_concat(arena, cmd, "-showdestinations ");
     } 
-    if (modes & mode_device) {
+    else if (modes & mode_device) {
         cmd = string_concat(arena, cmd, "-destination \"");
         cmd = string_concat(arena, cmd, device_name);
         cmd = string_concat(arena, cmd, "\" ");

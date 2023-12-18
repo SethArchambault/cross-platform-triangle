@@ -1,12 +1,9 @@
-#if 0
-    /usr/bin/clang++ build.cpp -g -fsanitize=address -O0 -o temp/build && 
-    ./temp/build $*
-    rm temp/build 
-    exit
-#endif
+//usr/bin/clang++ build.cpp -g -fsanitize=address -O0 -o temp/build && ./temp/build $*; rm temp/build;exit;
 
 #include<stdio.h>
 #include <stdlib.h>
+#include "../common.h"
+#include "../macos_platform.cpp"
 #include "../common.cpp"
 
 enum {

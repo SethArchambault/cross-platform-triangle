@@ -2,7 +2,7 @@
 #include <d3dcompiler.h>
 #include <windows.h>
 #include <stdio.h>
-#include "../types.cpp"
+#include "../common.h"
 #include "windows_platform.cpp"
 #include "../common.cpp"
 
@@ -18,15 +18,9 @@ LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     return DefWindowProc(hwnd, msg, wparam, lparam);
   }
 }
-int custom_func(int i) {
-    int idx = (i) % 5;
-    int val[] = {555,3332,1434,4543,3435};
-    int res = val[idx];
-    return res;
-}
 
 int main() {
-  const char *title = "Win32 + D3D11";
+  const char *title = "Shared Triangle";
 
   WNDCLASSA wc = {};
   wc.lpfnWndProc = wnd_proc;
@@ -75,27 +69,14 @@ int main() {
   }
 
   struct Vertex {
-    float position[3];
-    float color[4];
+    union {
+      F32 position[3];
+    };
+    F32 color[4];
   };
 
+  // okay this neds to move.
   ID3D11Buffer *vbuf = nullptr;
-  {
-    Vertex vertices[] = {
-        {{0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.5f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-    };
-
-    D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(vertices);
-    desc.Usage = D3D11_USAGE_IMMUTABLE;
-    desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-    D3D11_SUBRESOURCE_DATA data = {};
-    data.pSysMem = vertices;
-    device->CreateBuffer(&desc, &data, &vbuf);
-  }
 
   HINSTANCE dll = LoadLibraryA("d3dcompiler_47.dll");
   pD3DCompile d3d_compile_proc = (pD3DCompile)GetProcAddress(dll, "D3DCompile");
@@ -115,6 +96,8 @@ int main() {
     VertexOut vs_main(VertexIn input) {
       VertexOut output;
       output.position = float4(input.position, 1.0);
+      output.position.x  /= 800.;
+      output.position.y  /= 600.;
       output.position.xy *= 2.0;
       output.position.xy -= 1.0;
       output.position.y *= -1.0;
@@ -202,22 +185,42 @@ int main() {
 
     float bg_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
 
     D3D11_VIEWPORT viewport = {0.0f,          0.0f, (float)width,
                                (float)height, 0.0f, 1.0f};
 
     ctx->ClearRenderTargetView(rtv, bg_color);
+
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetInputLayout(input_layout);
-    ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &offset);
+    
+    Vertex vertices[] = {
+        {{0.0f, 100.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{50.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        {{100.0f, 100.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+    };
+    if (!vbuf) {
+        D3D11_BUFFER_DESC desc = {
+            .ByteWidth  = sizeof(vertices),
+            .Usage      = D3D11_USAGE_IMMUTABLE,
+            .BindFlags  = D3D11_BIND_VERTEX_BUFFER,
+        };
+        D3D11_SUBRESOURCE_DATA data = {
+            .pSysMem = vertices
+        };
+        device->CreateBuffer(&desc, &data, &vbuf);
+    }
+    {
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+        ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &offset);
+    }
     ctx->VSSetShader(vertex_shader, nullptr, 0);
     ctx->RSSetViewports(1, &viewport);
     ctx->RSSetState(rasterizer);
     ctx->PSSetShader(pixel_shader, nullptr, 0);
     ctx->OMSetRenderTargets(1, &rtv, nullptr);
-    ctx->Draw(3, 0);
+    ctx->Draw(sizeof(vertices) / sizeof(Vertex), 0);
 
     swapchain->Present(1, 0);
   }

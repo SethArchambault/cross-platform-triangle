@@ -22,12 +22,19 @@ void draw_arrow(const char * id, V2F32 pos, F32 width, F32 length, F32 turns, V3
         // upper center
         p3 = {pos.x + opposite, pos.y - adjacent};
     }
+    // code should be in windows_platform.cpp
     platform_draw_triangle(id, p1, p2, p3, color);
+}
+
+F32 rotation = 0.0;
+
+void game_mouse_move(S32 x, S32 y) {
+    rotation = x / 300.0;
 }
 
 S32 game_loop() {
     V3F32 color = {200.0, 0.0, 150.0};
     // TODO change this to a bulletproof array passing system that can be easily validated
-    draw_arrow("basic_triangle", {100.0, 200.0}, 50.0, 70.0, 0.25, color);
+    draw_arrow("basic_triangle", {100.0, 200.0}, 50.0, 70.0, rotation, color);
     return 0;
 }

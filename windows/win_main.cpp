@@ -1,6 +1,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <windows.h>
+#include <windowsx.h>
 #include <stdio.h>
 #define _USE_MATH_DEFINES
 #include "../common.h"
@@ -12,14 +13,20 @@
 #pragma comment(lib, "user32")
 #pragma comment(lib, "d3d11")
 
-LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-    printf("callback %u\n", msg);
-  switch (msg) {
-  case WM_DESTROY:
-    PostQuitMessage(0);
-    return 0;
-  default:
-    return DefWindowProc(hwnd, msg, wparam, lparam);
+LRESULT CALLBACK wnd_proc(HWND window_handle, UINT message_code, WPARAM wparam, LPARAM lparam) {
+  switch (message_code) {
+      case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+      case WM_MOUSEMOVE: {
+        S32 x_coord = GET_X_LPARAM(lparam);
+        S32 y_coord = GET_Y_LPARAM(lparam);
+        game_mouse_move(x_coord, y_coord);
+        printf("mouse moved %d, %d\n", x_coord, y_coord);
+        return 0;
+     }
+      default:
+        return DefWindowProc(window_handle, message_code, wparam, lparam);
   }
 }
 
@@ -52,13 +59,29 @@ void platform_draw_triangle(const char * id, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     if (!vbuf) {
         D3D11_BUFFER_DESC desc = {
             .ByteWidth  = sizeof(vertices),
-            .Usage      = D3D11_USAGE_IMMUTABLE,
+            .Usage      = D3D11_USAGE_DEFAULT,
             .BindFlags  = D3D11_BIND_VERTEX_BUFFER,
         };
         D3D11_SUBRESOURCE_DATA data = {
             .pSysMem = vertices
         };
         device->CreateBuffer(&desc, &data, &vbuf);
+    } else {
+        D3D11_SUBRESOURCE_DATA data = {
+            .pSysMem = vertices
+        };
+        /*
+void UpdateSubresource(
+  [in]           ID3D11Resource  *pDstResource,
+  [in]           UINT            DstSubresource,
+  [in, optional] const D3D11_BOX *pDstBox,
+  [in]           const void      *pSrcData,
+  [in]           UINT            SrcRowPitch,
+  [in]           UINT            SrcDepthPitch
+);
+*/
+        ctx->UpdateSubresource("test", 0, nullptr, &data, 0, 0 );
+        //'void ID3D11DeviceContext::UpdateSubresource(ID3D11Resource *,UINT,const D3D11_BOX *,const void *,UINT,UINT)':
     }
     {
         UINT stride = sizeof(Vertex);

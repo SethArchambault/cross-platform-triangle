@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <math.h>
 
 /// Types ////
 
@@ -17,6 +18,48 @@ typedef float       F32;
 typedef double      F64;
 
 typedef U8          B8;
+
+/// Vectors
+
+struct V2S32 {
+    S32 x;
+    S32 y;
+};
+
+struct V3S32 {
+    union {
+        S32 x;
+        S32 r;
+    };
+    union {
+        S32 y;
+        S32 g;
+    };
+    union {
+        S32 z;
+        S32 b;
+    };
+};
+
+struct V2F32 {
+    F32 x;
+    F32 y;
+};
+
+struct V3F32 {
+    union {
+        F32 x;
+        F32 r;
+    };
+    union {
+        F32 y;
+        F32 g;
+    };
+    union {
+        F32 z;
+        F32 b;
+    };
+};
 
 #define Gigabytes(count) (U64) (count * 1024 * 1024 * 1024)
 #define Megabytes(count) (U64) (count * 1024 * 1024)

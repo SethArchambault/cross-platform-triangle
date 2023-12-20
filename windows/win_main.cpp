@@ -2,14 +2,18 @@
 #include <d3dcompiler.h>
 #include <windows.h>
 #include <stdio.h>
+#define _USE_MATH_DEFINES
 #include "../common.h"
-#include "windows_platform.cpp"
+#include "../platform_main.h"
+#include "windows_common.cpp"
 #include "../common.cpp"
+#include "../main.cpp"
 
 #pragma comment(lib, "user32")
 #pragma comment(lib, "d3d11")
 
 LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+    printf("callback %u\n", msg);
   switch (msg) {
   case WM_DESTROY:
     PostQuitMessage(0);
@@ -18,6 +22,56 @@ LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     return DefWindowProc(hwnd, msg, wparam, lparam);
   }
 }
+
+struct Vertex {
+    union {
+        F32 position[3];
+    };
+    F32 color[4];
+};
+
+ID3D11DeviceContext *ctx = nullptr;
+ID3D11Device *device = nullptr;
+ID3D11Buffer *vbuf = nullptr;
+ID3D11VertexShader *vertex_shader = nullptr;
+ID3D11PixelShader *pixel_shader = nullptr;
+D3D11_VIEWPORT viewport;
+ID3D11RasterizerState *rasterizer = nullptr;
+ID3D11RenderTargetView *rtv = nullptr;
+
+//  draw_triangle("basic_triangle", {0.0, 100.0}, {100.0, 100.0}, {50.0, 0.0}, color);
+void platform_draw_triangle(const char * id, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
+    F32 vertice_color[4] = {color.r, color.g, color.b, 1.0f};
+
+    Vertex vertices[] = {
+        {{p1.x, p1.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
+        {{p3.x, p3.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
+        {{p2.x, p2.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
+    };
+
+    if (!vbuf) {
+        D3D11_BUFFER_DESC desc = {
+            .ByteWidth  = sizeof(vertices),
+            .Usage      = D3D11_USAGE_IMMUTABLE,
+            .BindFlags  = D3D11_BIND_VERTEX_BUFFER,
+        };
+        D3D11_SUBRESOURCE_DATA data = {
+            .pSysMem = vertices
+        };
+        device->CreateBuffer(&desc, &data, &vbuf);
+    }
+    {
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+        ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &offset);
+    }
+    ctx->VSSetShader(vertex_shader, nullptr, 0);
+    ctx->RSSetViewports(1, &viewport);
+    ctx->RSSetState(rasterizer);
+    ctx->PSSetShader(pixel_shader, nullptr, 0);
+    ctx->OMSetRenderTargets(1, &rtv, nullptr);
+    ctx->Draw(sizeof(vertices) / sizeof(Vertex), 0);
+};
 
 int main() {
   const char *title = "Shared Triangle";
@@ -35,8 +89,6 @@ int main() {
                               nullptr, nullptr, nullptr, nullptr);
 
   IDXGISwapChain *swapchain = nullptr;
-  ID3D11Device *device = nullptr;
-  ID3D11DeviceContext *ctx = nullptr;
   {
     DXGI_SWAP_CHAIN_DESC desc = {};
     desc.BufferCount = 2;
@@ -56,10 +108,8 @@ int main() {
   ID3D11Texture2D *render_target = nullptr;
   swapchain->GetBuffer(0, IID_PPV_ARGS(&render_target));
 
-  ID3D11RenderTargetView *rtv = nullptr;
   device->CreateRenderTargetView(render_target, 0, &rtv);
 
-  ID3D11RasterizerState *rasterizer = nullptr;
   {
     D3D11_RASTERIZER_DESC desc = {};
     desc.FillMode = D3D11_FILL_SOLID;
@@ -68,15 +118,8 @@ int main() {
     device->CreateRasterizerState(&desc, &rasterizer);
   }
 
-  struct Vertex {
-    union {
-      F32 position[3];
-    };
-    F32 color[4];
-  };
 
   // okay this neds to move.
-  ID3D11Buffer *vbuf = nullptr;
 
   HINSTANCE dll = LoadLibraryA("d3dcompiler_47.dll");
   pD3DCompile d3d_compile_proc = (pD3DCompile)GetProcAddress(dll, "D3DCompile");
@@ -101,6 +144,9 @@ int main() {
       output.position.xy *= 2.0;
       output.position.xy -= 1.0;
       output.position.y *= -1.0;
+      input.color.r /= 255;
+      input.color.g /= 255;
+      input.color.b /= 255;
       output.color = input.color;
       return output;
     }
@@ -116,7 +162,6 @@ int main() {
   compile_flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 
   ID3D11InputLayout *input_layout = nullptr;
-  ID3D11VertexShader *vertex_shader = nullptr;
   {
     ID3DBlob *vs_blob = nullptr;
     D3DCompile(hlsl, strlen(hlsl), nullptr, nullptr,
@@ -139,7 +184,6 @@ int main() {
                               vs_blob->GetBufferSize(), &input_layout);
   }
 
-  ID3D11PixelShader *pixel_shader = nullptr;
   {
     ID3DBlob *ps_blob = nullptr;
     D3DCompile(hlsl, strlen(hlsl), nullptr, nullptr,
@@ -186,41 +230,14 @@ int main() {
     float bg_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 
 
-    D3D11_VIEWPORT viewport = {0.0f,          0.0f, (float)width,
-                               (float)height, 0.0f, 1.0f};
+    viewport = {0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f};
 
     ctx->ClearRenderTargetView(rtv, bg_color);
 
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetInputLayout(input_layout);
     
-    Vertex vertices[] = {
-        {{0.0f, 100.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{50.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{100.0f, 100.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-    };
-    if (!vbuf) {
-        D3D11_BUFFER_DESC desc = {
-            .ByteWidth  = sizeof(vertices),
-            .Usage      = D3D11_USAGE_IMMUTABLE,
-            .BindFlags  = D3D11_BIND_VERTEX_BUFFER,
-        };
-        D3D11_SUBRESOURCE_DATA data = {
-            .pSysMem = vertices
-        };
-        device->CreateBuffer(&desc, &data, &vbuf);
-    }
-    {
-        UINT stride = sizeof(Vertex);
-        UINT offset = 0;
-        ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &offset);
-    }
-    ctx->VSSetShader(vertex_shader, nullptr, 0);
-    ctx->RSSetViewports(1, &viewport);
-    ctx->RSSetState(rasterizer);
-    ctx->PSSetShader(pixel_shader, nullptr, 0);
-    ctx->OMSetRenderTargets(1, &rtv, nullptr);
-    ctx->Draw(sizeof(vertices) / sizeof(Vertex), 0);
+    S32 result = game_loop();
 
     swapchain->Present(1, 0);
   }

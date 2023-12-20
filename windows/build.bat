@@ -1,4 +1,4 @@
 @echo off
-cl /Debug /std:c++20 /nologo /Zi main.cpp
+cl /Debug /std:c++20 /nologo /Zi win_main.cpp
 if %errorlevel% neq 0 exit /b %errorlevel%
-main.exe
+win_main.exe

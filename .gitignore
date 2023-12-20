@@ -54,10 +54,10 @@ Thumbs.db
 
 
 # windows
-windows/main.exe
-windows/main.ilk
-windows/main.obj
-windows/main.pdb
+windows/win_main.exe
+windows/win_main.ilk
+windows/win_main.obj
+windows/win_main.pdb
 windows/vc140.pdb
 
 

@@ -80,7 +80,7 @@ void UpdateSubresource(
   [in]           UINT            SrcDepthPitch
 );
 */
-        ctx->UpdateSubresource("test", 0, nullptr, &data, 0, 0 );
+        //ctx->UpdateSubresource("test", 0, nullptr, &data, 0, 0 );
         //'void ID3D11DeviceContext::UpdateSubresource(ID3D11Resource *,UINT,const D3D11_BOX *,const void *,UINT,UINT)':
     }
     {

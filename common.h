@@ -85,7 +85,9 @@ struct String {
 
 
 String * string_alloc(Arena * arena, U64 size);
+
 String * string_make(Arena * arena, const char * raw);
+String * string_make(Arena * arena, const char * raw, S32 num);
 String * string_concat(Arena * arena, String *str1, String *str2);
 String * string_concat(Arena * arena, String *str1, const char * raw);
 B8 string_compare(const char * raw1, const char * raw2);

@@ -17,6 +17,17 @@ String * string_make(Arena * arena, const char * raw) {
     return str;
 }
 
+String * string_make(Arena * arena, const char * raw, S32 num) {
+    U64 str_len = (U64) strlen(raw);
+    char num_raw[100];
+    sprintf(num_raw, "%d", num);
+    U64 num_len = (U64) strlen(num_raw);
+    String * str = string_alloc(arena, str_len + num_len);
+    memcpy(str->data, raw, str_len);
+    memcpy(str->data+str_len, num_raw, num_len);
+    return str;
+}
+
 String * string_concat(Arena * arena, String *str1, String *str2) {
     U64 str3_size = str1->size + str2->size;
     String * str3 = string_alloc(arena, str3_size);
@@ -34,6 +45,14 @@ String * string_concat(Arena * arena, String *str1, const char * raw) {
     memcpy(str3->data, str1->data, str1->size);
     memcpy(str3->data + str1->size, raw, raw_size);
     return str3;
+}
+
+B8 string_compare(String *raw1, String *raw2) {
+    if (raw1->size != raw2->size) return false;
+    for(U32 idx = 0; idx < raw1->size; ++idx) {
+        if (raw1->data[idx] != raw2->data[idx]) return false;
+    }
+    return true;
 }
 
 B8 string_compare(const char * raw1, const char * raw2) {

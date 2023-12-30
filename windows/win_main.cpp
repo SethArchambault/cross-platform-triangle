@@ -36,7 +36,6 @@ struct Vertex {
     };
     F32 color[4];
 };
-#define BUFFER_MAX 5
 
 ID3D11DeviceContext *ctx = nullptr;
 ID3D11Device *device = nullptr;

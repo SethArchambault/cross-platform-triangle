@@ -1,4 +1,27 @@
-void draw_arrow(const char * id, V2F32 pos, F32 width, F32 length, F32 turns, V3F32 color) {
+#define FNV_OFFSET 14695981039346656037UL
+#define FNV_PRIME 1099511628211UL
+
+#define BUFFER_MAX  11
+
+#ifdef DEBUG_HASH
+#define debug_hash printf
+#else
+#define debug_hash //
+#endif
+
+// Return 64-bit FNV-1a hash for key (NUL-terminated). See description:
+// https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
+// previously U64
+static S32 hash_key(String *key) {
+    U64 hash = FNV_OFFSET;
+    for (S32 idx = 0; idx < key->size; idx++) {
+        hash ^= (U64)(unsigned char)(*(key->data + idx));
+        hash *= FNV_PRIME;
+    }
+    return hash % BUFFER_MAX;
+}
+
+void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3F32 color) {
     V2F32 p1;
     V2F32 p2;
     V2F32 p3;
@@ -23,8 +46,9 @@ void draw_arrow(const char * id, V2F32 pos, F32 width, F32 length, F32 turns, V3
         p3 = {pos.x + opposite, pos.y - adjacent};
     }
     // code should be in windows_platform.cpp
-    platform_draw_triangle(id, p1, p2, p3, color);
+    platform_draw_triangle(id_str, p1, p2, p3, color);
 }
+
 
 F32 rotation = 0.0;
 
@@ -32,9 +56,21 @@ void game_mouse_move(S32 x, S32 y) {
     rotation = x / 300.0;
 }
 
+struct State {
+    B32 initialized;
+    Arena * arena;
+};
+State __s;
+
 S32 game_loop() {
+    if (!__s.initialized) {
+        __s.arena = arena_init();
+        __s.initialized = 1;
+    }
     V3F32 color = {200.0, 0.0, 150.0};
-    // TODO change this to a bulletproof array passing system that can be easily validated
-    draw_arrow("basic_triangle", {100.0, 200.0}, 50.0, 70.0, rotation, color);
+    for (S32 idx = 0; idx < 11; idx++) {
+        String *id_str = string_make(__s.arena, "basic_triangle", idx);
+        draw_arrow(id_str, {idx*10.0f, idx*15.0f}, 50.0f, 70.0f, rotation+idx*0.1, color);
+    }
     return 0;
 }

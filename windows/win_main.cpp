@@ -36,10 +36,12 @@ struct Vertex {
     };
     F32 color[4];
 };
+#define BUFFER_MAX 5
 
 ID3D11DeviceContext *ctx = nullptr;
 ID3D11Device *device = nullptr;
-ID3D11Buffer *vbuf = nullptr;
+ID3D11Buffer *buffer_arr[BUFFER_MAX] = {nullptr};
+String *buffer_str_arr[BUFFER_MAX]; 
 ID3D11VertexShader *vertex_shader = nullptr;
 ID3D11PixelShader *pixel_shader = nullptr;
 D3D11_VIEWPORT viewport;
@@ -47,46 +49,85 @@ ID3D11RasterizerState *rasterizer = nullptr;
 ID3D11RenderTargetView *rtv = nullptr;
 
 //  draw_triangle("basic_triangle", {0.0, 100.0}, {100.0, 100.0}, {50.0, 0.0}, color);
-void platform_draw_triangle(const char * id, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
-    F32 vertice_color[4] = {color.r, color.g, color.b, 1.0f};
+void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
 
+    //
+    // get hash_idx
+    //
+    S32 hash_idx = hash_key(id_str);
+    S32 hash_idx_start = hash_idx;
+    for (;;) {
+        if (!buffer_arr[hash_idx]) {
+            //string_print(id_str);
+            debug_hash("id placed in bucket %d\n", hash_idx);
+            break;
+        }
+        if (string_compare(buffer_str_arr[hash_idx], id_str)) {
+            //string_print(id_str);
+            debug_hash("id found in bucket %d\n", hash_idx);
+            break;
+        }
+        //string_print(id_str);
+        debug_hash("id can't be placed in bucket %d, moving on\n",  hash_idx);
+        hash_idx++;
+        // wrap around
+        if (hash_idx >= BUFFER_MAX) {
+            debug_hash("at the end of list starting over\n");
+            hash_idx = 0;
+        }
+        if (hash_idx == hash_idx_start) {
+            debug_hash("Scanned all possibilities, couldn't find place for buffer, increase BUFFER_MAX\n");
+
+            debug_hash("id: ");
+            //string_print(id_str);
+            debug_hash("buffer_str_arr:\n");
+            for (S32 idx = 0; idx < BUFFER_MAX; ++idx) {
+                debug_hash("%d:\t", idx);
+                //string_print(buffer_str_arr[idx]);
+            }
+            assert(0);
+            // print contents of buffer_str_arr
+        }
+    }
+
+    //
+    /// build buffer
+    //
     Vertex vertices[] = {
         {{p1.x, p1.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
         {{p3.x, p3.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
         {{p2.x, p2.y, 0.0f}, {color.r, color.g, color.b, 1.0f}},
     };
-
-    if (!vbuf) {
+    if (!buffer_arr[hash_idx]) {
+        //string_print(id_str);
+        // @danger - we should free up buffer_str_arr[hash_idx] in case it's already been used?
+        buffer_str_arr[hash_idx] = id_str;
         D3D11_BUFFER_DESC desc = {
-            .ByteWidth  = sizeof(vertices),
-            .Usage      = D3D11_USAGE_DEFAULT,
-            .BindFlags  = D3D11_BIND_VERTEX_BUFFER,
+            .ByteWidth      = sizeof(vertices),
+            .Usage          = D3D11_USAGE_DYNAMIC,
+            .BindFlags      = D3D11_BIND_VERTEX_BUFFER,
+            .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
         };
-        D3D11_SUBRESOURCE_DATA data = {
-            .pSysMem = vertices
-        };
-        device->CreateBuffer(&desc, &data, &vbuf);
-    } else {
-        D3D11_SUBRESOURCE_DATA data = {
-            .pSysMem = vertices
-        };
-        /*
-void UpdateSubresource(
-  [in]           ID3D11Resource  *pDstResource,
-  [in]           UINT            DstSubresource,
-  [in, optional] const D3D11_BOX *pDstBox,
-  [in]           const void      *pSrcData,
-  [in]           UINT            SrcRowPitch,
-  [in]           UINT            SrcDepthPitch
-);
-*/
-        //ctx->UpdateSubresource("test", 0, nullptr, &data, 0, 0 );
-        //'void ID3D11DeviceContext::UpdateSubresource(ID3D11Resource *,UINT,const D3D11_BOX *,const void *,UINT,UINT)':
+        device->CreateBuffer(&desc, NULL, &buffer_arr[hash_idx]);
     }
+
+    //
+    /// Map Buffer
+    //
+    //string_print(buffer_str_arr[hash_idx]);
+    D3D11_MAPPED_SUBRESOURCE mapped_subresource;
+    ctx->Map(buffer_arr[hash_idx], NULL, D3D11_MAP_WRITE_DISCARD, NULL, 
+        &mapped_subresource);   
+    memcpy(mapped_subresource.pData, vertices, sizeof(vertices));
+    ctx->Unmap(buffer_arr[hash_idx], NULL);
+
+    // 
+    // Set Vertex Buffers
+    //
     {
         UINT stride = sizeof(Vertex);
         UINT offset = 0;
-        ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &offset);
+        ctx->IASetVertexBuffers(0, 1, &buffer_arr[hash_idx], &stride, &offset);
     }
     ctx->VSSetShader(vertex_shader, nullptr, 0);
     ctx->RSSetViewports(1, &viewport);

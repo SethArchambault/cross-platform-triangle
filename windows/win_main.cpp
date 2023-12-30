@@ -40,7 +40,7 @@ struct Vertex {
 ID3D11DeviceContext *ctx = nullptr;
 ID3D11Device *device = nullptr;
 ID3D11Buffer *buffer_arr[BUFFER_MAX] = {nullptr};
-String *buffer_str_arr[BUFFER_MAX]; 
+U8 *buffer_str_arr[BUFFER_MAX]; 
 ID3D11VertexShader *vertex_shader = nullptr;
 ID3D11PixelShader *pixel_shader = nullptr;
 D3D11_VIEWPORT viewport;
@@ -61,7 +61,7 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
             debug_hash("id placed in bucket %d\n", hash_idx);
             break;
         }
-        if (string_compare(buffer_str_arr[hash_idx], id_str)) {
+        if (string_compare((String *)buffer_str_arr[hash_idx], id_str)) {
             //string_print(id_str);
             debug_hash("id found in bucket %d\n", hash_idx);
             break;
@@ -100,7 +100,9 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     if (!buffer_arr[hash_idx]) {
         //string_print(id_str);
         // @danger - we should free up buffer_str_arr[hash_idx] in case it's already been used?
-        buffer_str_arr[hash_idx] = id_str;
+        
+
+        buffer_str_arr[hash_idx] = (U8 *)id_str;
         D3D11_BUFFER_DESC desc = {
             .ByteWidth      = sizeof(vertices),
             .Usage          = D3D11_USAGE_DYNAMIC,

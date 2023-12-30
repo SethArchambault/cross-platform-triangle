@@ -1,7 +1,7 @@
 #define FNV_OFFSET 14695981039346656037UL
 #define FNV_PRIME 1099511628211UL
 
-#define BUFFER_MAX  11
+#define BUFFER_MAX  50
 
 #ifdef DEBUG_HASH
 #define debug_hash printf
@@ -68,9 +68,9 @@ S32 game_loop() {
         __s.initialized = 1;
     }
     V3F32 color = {200.0, 0.0, 150.0};
-    for (S32 idx = 0; idx < 11; idx++) {
+    for (S32 idx = 0; idx < 50; idx++) {
         String *id_str = string_make(__s.arena, "basic_triangle", idx);
-        draw_arrow(id_str, {idx*10.0f, idx*15.0f}, 50.0f, 70.0f, rotation+idx*0.1, color);
+        draw_arrow(id_str, {idx*50.0f, idx*25.0f}, 50.0f, 70.0f, rotation+idx*0.1, color);
     }
     return 0;
 }

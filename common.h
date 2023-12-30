@@ -67,7 +67,9 @@ struct V3F32 {
 
 #define ARENA_MAX Gigabytes(1)
 
+//
 /// Memory
+//
 
 struct Arena {
     U8 *mem;
@@ -76,16 +78,16 @@ struct Arena {
     U64 commit_pos;
 };
 
+//
 /// String
+//
 
 struct String {
     U64 size;
     U8 *data;
 };
 
-
 String * string_alloc(Arena * arena, U64 size);
-
 String * string_make(Arena * arena, const char * raw);
 String * string_make(Arena * arena, const char * raw, S32 num);
 String * string_concat(Arena * arena, String *str1, String *str2);
@@ -94,4 +96,4 @@ B8 string_compare(const char * raw1, const char * raw2);
 void string_print(String * str);
 
 Arena * arena_init();
-void arena_alloc(Arena * arena, U64 size);
+U8 * arena_alloc(Arena * arena, U64 size);

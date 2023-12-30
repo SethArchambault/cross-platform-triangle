@@ -17,9 +17,12 @@ Arena * arena_init() {
     return arena;
 }
 
-void arena_alloc(Arena * arena, U64 size) {
+// alloc_pos is the starting point of the memoroy
+// commit_post is the ending point of the memory
+U8 * arena_alloc(Arena * arena, U64 size) {
     U64 start = arena->alloc_pos;
     arena->alloc_pos = arena->commit_pos;
     arena->commit_pos += size;
+    return (U8 *) arena->mem + arena->alloc_pos;
 }
 

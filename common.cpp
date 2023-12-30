@@ -3,10 +3,11 @@
 
 String * string_alloc(Arena * arena, U64 size) {
     arena_alloc(arena, size + 64);
-    String * str = (String *) arena->mem + arena->alloc_pos;
+    String * broken_str = (String *) arena->mem + arena->alloc_pos;
+    String * str = (String *) (arena->mem + arena->alloc_pos);
     //__asan_unpoison_memory_region(str, arena->alloc_pos + 64);
     str->size  = size;
-    str->data  = (U8 *)arena->mem + arena->alloc_pos + 64;
+    str->data  = arena->mem + arena->alloc_pos + 64;
     return str;
 }
 

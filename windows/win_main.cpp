@@ -22,7 +22,7 @@ LRESULT CALLBACK wnd_proc(HWND window_handle, UINT message_code, WPARAM wparam, 
         S32 x_coord = GET_X_LPARAM(lparam);
         S32 y_coord = GET_Y_LPARAM(lparam);
         game_mouse_move(x_coord, y_coord);
-        printf("mouse moved %d, %d\n", x_coord, y_coord);
+        //printf("mouse moved %d, %d\n", x_coord, y_coord);
         return 0;
      }
       default:

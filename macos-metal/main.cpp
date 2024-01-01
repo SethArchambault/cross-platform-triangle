@@ -11,7 +11,12 @@
 
 #include <simd/simd.h>
 
+#define _USE_MATH_DEFINES
 #include "../common.h"
+#include "../platform_main.h"
+#include "../macos_platform.cpp"
+#include "../common.cpp"
+#include "../main.cpp"
 
 #pragma clang diagnostic pop
 
@@ -20,8 +25,8 @@
     // previously in the private below
 MTL::RenderPipelineState* render_pipeline_state;
 MTL::CommandQueue* _pCommandQueue;
-MTL::Buffer* _pVertexPositionsBuffer[2];
-MTL::Buffer* _pVertexColorsBuffer[2];
+MTL::Buffer* _pVertexPositionsBuffer[BUFFER_MAX];
+MTL::Buffer* _pVertexColorsBuffer[BUFFER_MAX];
 
 MTL::Device* seth_pDevice;
 class SethMtkViewDelegate : public MTK::ViewDelegate
@@ -29,6 +34,7 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
     public:
         SethMtkViewDelegate( MTL::Device* pDevice );
         virtual void drawInMTKView( MTK::View* pView ) override;
+        virtual void mouseMoved(NSEvent *) event override;
 
     private:
         MTL::Device* _pDevice;
@@ -53,6 +59,8 @@ class SethDelegate : public NS::ApplicationDelegate
 };
 
 #pragma endregion Declarations }
+
+Arena * arena;
 
 /// :main
 int main( int argc, char* argv[] )
@@ -167,6 +175,9 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
 : MTK::ViewDelegate()
 , _pDevice( pDevice->retain() )
 {
+
+    arena = arena_init();
+
     /// old renderer
     _pCommandQueue = _pDevice->newCommandQueue();
     /// Shader
@@ -236,11 +247,59 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
 
 }
 
+U8 *buffer_str_arr[BUFFER_MAX]; 
 MTK::View* seth_view;
 MTL::RenderCommandEncoder* render_cmd_encoder;
-void platform_draw_triangle(S32 buffer_idx, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
+void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
+
+
+    //
+    // get hash_idx - seth - this can probably be compressed
+    //
+    S32 hash_idx = (S32)hash_key(id_str);
+    S32 hash_idx_start = hash_idx;
+    for (;;) {
+        if (!_pVertexPositionsBuffer[hash_idx]) {
+            //string_print(id_str);
+            debug_hash("id placed in bucket %d\n", hash_idx);
+            break;
+        }
+        if (string_compare((String *)buffer_str_arr[hash_idx], id_str)) {
+            //string_print(id_str);
+            debug_hash("id found in bucket %d\n", hash_idx);
+            break;
+        }
+        //string_print(id_str);
+        debug_hash("id can't be placed in bucket %d, moving on\n",  hash_idx);
+        hash_idx++;
+        // wrap around
+        if (hash_idx >= BUFFER_MAX) {
+            debug_hash("at the end of list starting over\n");
+            hash_idx = 0;
+        }
+        if (hash_idx == hash_idx_start) {
+            debug_hash("Scanned all possibilities, couldn't find place for buffer, increase BUFFER_MAX\n");
+
+            debug_hash("id: ");
+            //string_print(id_str);
+            debug_hash("buffer_str_arr:\n");
+            for (S32 idx = 0; idx < BUFFER_MAX; ++idx) {
+                debug_hash("%d:\t", idx);
+                //string_print(buffer_str_arr[idx]);
+            }
+            assert(0);
+            // print contents of buffer_str_arr
+        }
+    }
+
+
+    S32 buffer_idx = hash_idx;
+
+
     // buffers
         if(!_pVertexPositionsBuffer[buffer_idx]) {
+
+            buffer_str_arr[hash_idx] = (U8 *)id_str;
             const size_t NumVertices = 3;
             simd::float3 positions[NumVertices] = {
                 {p1.x, p1.y, 0.0f}, 
@@ -284,7 +343,6 @@ SethMtkViewDelegate::~SethMtkViewDelegate()
 */
 void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
 {
-
     seth_pDevice = _pDevice;
     seth_view = view;
     NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
@@ -293,16 +351,19 @@ void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
     MTL::RenderPassDescriptor* render_pass_desc = seth_view ->currentRenderPassDescriptor();
     render_cmd_encoder = command_buffer->renderCommandEncoder( render_pass_desc );
     render_cmd_encoder->setRenderPipelineState( render_pipeline_state );
-
-    V3F32 color = {{200.0}, {0.0}, {150.0}};
-    platform_draw_triangle(0, {0.0f, 600.0f}, {600.0f, 600.0f}, {300.0f, 0.0f}, color);
-    platform_draw_triangle(1, {300.0f, 600.0f}, {800.0f, 800.0f}, {500.0f, 0.0f}, color);
+    game_loop();
     render_cmd_encoder->endEncoding();
     command_buffer->presentDrawable( seth_view->currentDrawable() );
     command_buffer->commit();
 
     pool->release();
 }
+
+void SethMtkViewDelegate::mouseMoved(NSEvent * event) 
+{
+    printf("mouse moved\n");
+}
+
 
 #pragma endregion ViewDelegate }
 

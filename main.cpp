@@ -14,11 +14,11 @@
 // previously U64
 static S32 hash_key(String *key) {
     U64 hash = FNV_OFFSET;
-    for (S32 idx = 0; idx < key->size; idx++) {
+    for (U64 idx = 0; idx < key->size; idx++) {
         hash ^= (U64)(unsigned char)(*(key->data + idx));
         hash *= FNV_PRIME;
     }
-    return hash % BUFFER_MAX;
+    return (S32) (hash % BUFFER_MAX);
 }
 
 void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3F32 color) {
@@ -27,8 +27,8 @@ void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3
     V2F32 p3;
     F32 degrees = turns * 360.0f;
     {
-        F32 hypotenuse = width / 2;
-        F32 radians = degrees * M_PI / 180;
+        F32 hypotenuse = width / 2.0f;
+        F32 radians = degrees * (F32) M_PI / 180.0f;
         F32 adjacent = cos(radians) * hypotenuse;
         F32 opposite = sin(radians) * hypotenuse;
 
@@ -39,7 +39,7 @@ void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3
     }
     {
         F32 hypotenuse = length;
-        F32 radians = degrees * M_PI / 180;
+        F32 radians = degrees * (F32) M_PI / 180;
         F32 adjacent = cos(radians) * hypotenuse;
         F32 opposite = sin(radians) * hypotenuse;
         // upper center
@@ -53,7 +53,7 @@ void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3
 F32 rotation = 0.0;
 
 void game_mouse_move(S32 x, S32 y) {
-    rotation = x / 300.0;
+    rotation = (F32) x / 300.0f;
 }
 
 struct State {
@@ -67,10 +67,11 @@ S32 game_loop() {
         __s.arena = arena_init();
         __s.initialized = 1;
     }
-    V3F32 color = {200.0, 0.0, 150.0};
+    V3F32 color = {{200.0}, {0.0}, {150.0}};
     for (S32 idx = 0; idx < 50; idx++) {
         String *id_str = string_make(__s.arena, "basic_triangle", idx);
-        draw_arrow(id_str, {idx*50.0f, idx*25.0f}, 50.0f, 70.0f, rotation+idx*0.1, color);
+        draw_arrow(id_str, {idx*50.0f, idx*25.0f}, 50.0f, 70.0f, rotation+(F32)idx*0.1f, color);
     }
     return 0;
 }
+

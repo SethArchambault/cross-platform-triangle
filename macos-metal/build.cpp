@@ -46,11 +46,11 @@ S32 command_run(Arena *arena, S32 modes)
         string_print(cmd);
         return 0;
     }
-    cmd = string_concat(arena, cmd, "clang++ main.cpp ");
+    cmd = string_concat(arena, cmd, "clang++ macos_main.cpp ");
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
     cmd = string_concat(arena, cmd,
         "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
-        "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations "
+        "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-value "
         "-ferror-limit=4 "
         "-I includes "
         "-framework Metal -framework Foundation -framework Cocoa -framework CoreGraphics -framework MetalKit "

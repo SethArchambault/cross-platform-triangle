@@ -1,4 +1,4 @@
-//usr/bin/clang++ build.cpp -g -fsanitize=address -O0 -o temp/build && ./temp/build $*; rm temp/build;exit;
+//usr/bin/clang++ build.cpp -g -fsanitize=address -Wno-deprecated-declarations -O0 -o temp/build && ./temp/build $*; rm temp/build;exit;
 
 #include<stdio.h>
 #include <stdlib.h>
@@ -49,8 +49,8 @@ S32 command_run(Arena *arena, S32 modes)
     cmd = string_concat(arena, cmd, "clang++ main.cpp ");
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
     cmd = string_concat(arena, cmd,
-        "-std=c++17 -Werror -Wall -Wextra -Wshadow -Wconversion "
-        "-Wno-unused-variable -Wno-unused-parameter "
+        "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
+        "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations "
         "-ferror-limit=4 "
         "-I includes "
         "-framework Metal -framework Foundation -framework Cocoa -framework CoreGraphics -framework MetalKit "

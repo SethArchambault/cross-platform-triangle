@@ -17,10 +17,11 @@ Arena * arena_init() {
     return arena;
 }
 
-void arena_alloc(Arena * arena, U64 size) {
+U8 * arena_alloc(Arena * arena, U64 size) {
     U64 start = arena->alloc_pos;
     arena->alloc_pos = arena->commit_pos;
     arena->commit_pos += size;
+    return (U8 *) arena->mem + arena->alloc_pos;
     // maybe need to align bytes before I can use memory positioning
     // I think I have to get the alloc before hand..
     //__asan_unpoison_memory_region(arena->mem + arena->alloc_pos, size);

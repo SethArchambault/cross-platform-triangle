@@ -11,10 +11,19 @@
 
 #include <simd/simd.h>
 
+#include "../common.h"
+
 #pragma clang diagnostic pop
 
 #pragma region Declarations {
 
+    // previously in the private below
+MTL::RenderPipelineState* render_pipeline_state;
+MTL::CommandQueue* _pCommandQueue;
+MTL::Buffer* _pVertexPositionsBuffer[2];
+MTL::Buffer* _pVertexColorsBuffer[2];
+
+MTL::Device* seth_pDevice;
 class SethMtkViewDelegate : public MTK::ViewDelegate
 {
     public:
@@ -23,10 +32,6 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
 
     private:
         MTL::Device* _pDevice;
-        MTL::CommandQueue* _pCommandQueue;
-        MTL::RenderPipelineState* _pPSO;
-        MTL::Buffer* _pVertexPositionsBuffer;
-        MTL::Buffer* _pVertexColorsBuffer;
 };
 
 class SethDelegate : public NS::ApplicationDelegate
@@ -215,8 +220,8 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
         pDesc->setFragmentFunction( pFragFn );
         pDesc->colorAttachments()->object(0)->setPixelFormat( MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB );
 
-        _pPSO = _pDevice->newRenderPipelineState( pDesc, &pError );
-        if ( !_pPSO )
+        render_pipeline_state = _pDevice->newRenderPipelineState( pDesc, &pError );
+        if ( !render_pipeline_state )
         {
             __builtin_printf( "%s", pError->localizedDescription()->utf8String() );
             assert( false );
@@ -228,74 +233,75 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
         pLibrary->release();
     }
  
-    // buffers
-    {
-        const size_t NumVertices = 3;
-
-        simd::float3 positions[NumVertices] =
-        {
-            { 0.0f, 600.0f, 0.0f },
-            {  1000.0f, 600.0f, 0.0f },
-            {  500.0f,  0.0f, 0.0f }
-        };
-
-        simd::float3 colors[NumVertices] =
-        {
-            {  1.0f, 0.0f, 0.0f },
-            {  1.0f, 0.0f, 0.0f },
-            {  1.0f, 0.0f, 0.0f }
-        };
-
-        const size_t positionsDataSize = NumVertices * sizeof( simd::float3 );
-        const size_t colorDataSize = NumVertices * sizeof( simd::float3 );
-
-        MTL::Buffer* pVertexPositionsBuffer = _pDevice->newBuffer( positionsDataSize, MTL::ResourceStorageModeManaged );
-        MTL::Buffer* pVertexColorsBuffer = _pDevice->newBuffer( colorDataSize, MTL::ResourceStorageModeManaged );
-
-        _pVertexPositionsBuffer = pVertexPositionsBuffer;
-        _pVertexColorsBuffer = pVertexColorsBuffer;
-
-        memcpy( _pVertexPositionsBuffer->contents(), positions, positionsDataSize );
-        memcpy( _pVertexColorsBuffer->contents(), colors, colorDataSize );
-
-        _pVertexPositionsBuffer->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer->length() ) );
-        _pVertexColorsBuffer->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer->length() ) );
-    }
 
 }
 
-    /* not needed 
+MTK::View* seth_view;
+MTL::RenderCommandEncoder* render_cmd_encoder;
+void platform_draw_triangle(S32 buffer_idx, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
+    // buffers
+        if(!_pVertexPositionsBuffer[buffer_idx]) {
+            const size_t NumVertices = 3;
+            simd::float3 positions[NumVertices] = {
+                {p1.x, p1.y, 0.0f}, 
+                {p3.x, p3.y, 0.0f},
+                {p2.x, p2.y, 0.0f},
+            };
+
+            simd::float3 colors[NumVertices] = {
+                {color.r, color.g, color.b},
+                {color.r, color.g, color.b},
+                {color.r, color.g, color.b},
+            };
+            _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
+            _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
+
+            memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
+            memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
+
+            _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[0]->length() ) );
+            _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[0]->length() ) );
+        } // buffer
+
+    /// draw
+    {
+        render_cmd_encoder->setVertexBuffer( _pVertexPositionsBuffer[buffer_idx], 0, 0 );
+        render_cmd_encoder->setVertexBuffer( _pVertexColorsBuffer[buffer_idx], 0, 1 );
+        render_cmd_encoder->drawPrimitives( MTL::PrimitiveType::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(3) );
+        
+    }
+}
+
+/* not needed 
 SethMtkViewDelegate::~SethMtkViewDelegate()
 {
     _pVertexPositionsBuffer->release();
     _pVertexColorsBuffer->release();
-    _pPSO->release();
+    render_pipeline_state->release();
     _pCommandQueue->release();
     _pDevice->release();
 }
-
-    */
-void SethMtkViewDelegate::drawInMTKView( MTK::View* pView )
+*/
+void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
 {
-    /// draw
-    {
-        NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
 
-        MTL::CommandBuffer* pCmd = _pCommandQueue->commandBuffer();
-        MTL::RenderPassDescriptor* pRpd = pView->currentRenderPassDescriptor();
-        MTL::RenderCommandEncoder* pEnc = pCmd->renderCommandEncoder( pRpd );
+    seth_pDevice = _pDevice;
+    seth_view = view;
+    NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
-        pEnc->setRenderPipelineState( _pPSO );
-        pEnc->setVertexBuffer( _pVertexPositionsBuffer, 0, 0 );
-        pEnc->setVertexBuffer( _pVertexColorsBuffer, 0, 1 );
-        pEnc->drawPrimitives( MTL::PrimitiveType::PrimitiveTypeTriangle, NS::UInteger(0), NS::UInteger(3) );
-        
-        pEnc->endEncoding();
-        pCmd->presentDrawable( pView->currentDrawable() );
-        pCmd->commit();
+    MTL::CommandBuffer* command_buffer = _pCommandQueue->commandBuffer();
+    MTL::RenderPassDescriptor* render_pass_desc = seth_view ->currentRenderPassDescriptor();
+    render_cmd_encoder = command_buffer->renderCommandEncoder( render_pass_desc );
+    render_cmd_encoder->setRenderPipelineState( render_pipeline_state );
 
-        pPool->release();
-    }
+    V3F32 color = {{200.0}, {0.0}, {150.0}};
+    platform_draw_triangle(0, {0.0f, 600.0f}, {600.0f, 600.0f}, {300.0f, 0.0f}, color);
+    platform_draw_triangle(1, {300.0f, 600.0f}, {800.0f, 800.0f}, {500.0f, 0.0f}, color);
+    render_cmd_encoder->endEncoding();
+    command_buffer->presentDrawable( seth_view->currentDrawable() );
+    command_buffer->commit();
+
+    pool->release();
 }
 
 #pragma endregion ViewDelegate }

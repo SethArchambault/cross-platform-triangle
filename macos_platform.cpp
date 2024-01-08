@@ -20,7 +20,9 @@ Arena * arena_init() {
 U8 * arena_alloc(Arena * arena, U64 size) {
     U64 start = arena->alloc_pos;
     arena->alloc_pos = arena->commit_pos;
-    arena->commit_pos += size;
+    // My solution for memory alignment
+    // but can get better perfo
+    arena->commit_pos += size + (8 - (size % 8));
     return (U8 *) arena->mem + arena->alloc_pos;
     // maybe need to align bytes before I can use memory positioning
     // I think I have to get the alloc before hand..

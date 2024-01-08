@@ -7,7 +7,7 @@ String * string_alloc(Arena * arena, U64 size) {
     String * str = (String *) (arena->mem + arena->alloc_pos);
     //__asan_unpoison_memory_region(str, arena->alloc_pos + 64);
     str->size  = size;
-    str->data  = arena->mem + arena->alloc_pos + 64;
+    str->data  = (U64*)arena->mem + arena->alloc_pos + 64;
     return str;
 }
 
@@ -66,7 +66,7 @@ B8 string_compare(const char * raw1, const char * raw2) {
 }
 
 void string_print(String * str) {
-    printf("%.*s\n", (int)str->size, str->data);
+    printf("%.*s\n", (int)str->size, (char *)str->data);
 }
 
 

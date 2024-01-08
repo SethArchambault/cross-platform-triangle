@@ -4,23 +4,11 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "main",
     });
-    //exe.addIncludePath("includes");
-    //exe.addIncludeDir("includes");
     exe.addIncludePath(.{ .path = "includes" });
     exe.addCSourceFiles(&.{
         "main.cpp",
     }, &.{
         "-g",
-        //"-fsanitize=address",
-        "-fno-sanitize=undefined", // undefined behavior crash is hit otherwise..
-        //        "-static-libsan",
-        //
-        // these crash zig:
-        //"-fsanitize=undefined",
-        //"-fno-sanitize-trap=undefined", // prevent unhelpful crash
-        //"-fno-sanitize-recover=undefined",
-        //"-fno-sanitize-recover=all", // crashes with message
-        //"-fsanitize-minimal-runtime", // maybe will help?
         "-std=c++20",
         "-Werror",
         "-Wall",
@@ -31,14 +19,13 @@ pub fn build(b: *std.Build) void {
         "-Wno-unused-parameter",
         "-Wno-deprecated-declarations",
         "-Wno-unused-value",
-        //        "-ferror-limit=4",
-        //"-O1",
+        "-ferror-limit=4",
+        "-O1",
         "-o temp/main",
     });
     exe.linkLibC();
     exe.linkLibCpp();
     exe.linkSystemLibrary("c++");
-    //exe.linkSystemLibrary("ubsan");
     exe.linkFramework("Metal");
     exe.linkFramework("Foundation");
     exe.linkFramework("Cocoa");

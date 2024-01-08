@@ -59,7 +59,10 @@ S32 command_run(Arena *arena, S32 modes)
         return 0;
     }
     cmd = string_concat(arena, cmd, "time clang++ macos_main.cpp ");
-    cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
+    cmd = string_concat(arena, cmd, "-g -fsanitize=address "
+//        "-fsanitize=undefined " used to work but now doesn't do anything..
+          "-fno-sanitize-recover=all " // crashes with message
+            "-static-libsan ");
     if (!(modes & mode_nopoison)) {
         cmd = string_concat(arena, cmd, "-DPOISON "); 
     }
@@ -67,8 +70,6 @@ S32 command_run(Arena *arena, S32 modes)
         cmd = string_concat(arena, cmd, "-DDEBUG_HASH "); 
     }
     cmd = string_concat(arena, cmd,
-        "-fsanitize=undefined "
-        "-fno-sanitize-recover=all " // crashes with message
         "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
         "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-value "
         "-ferror-limit=4 "

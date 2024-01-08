@@ -318,8 +318,8 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
             memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
             memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
 
-            _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[0]->length() ) );
-            _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[0]->length() ) );
+            _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
+            _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
         } // buffer
 
     /// draw

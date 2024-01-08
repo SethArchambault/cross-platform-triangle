@@ -148,9 +148,9 @@ int main() {
   wc.lpszClassName = title;
   RegisterClassA(&wc);
 
-  int width = 800, height = 600;
+  int screen_width = 800, screen_height = 600;
   HWND hwnd = CreateWindowExA(0, title, title, WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                              CW_USEDEFAULT, CW_USEDEFAULT, width, height,
+                              CW_USEDEFAULT, CW_USEDEFAULT, screen_width, screen_height,
                               nullptr, nullptr, nullptr, nullptr);
 
   IDXGISwapChain *swapchain = nullptr;
@@ -260,7 +260,7 @@ int main() {
     ps_blob->Release();
   }
 
-  int swapchain_width = width, swapchain_height = height;
+  int swapchain_width = screen_width, swapchain_height = screen_height;
 
   bool should_quit = false;
   while (!should_quit) {
@@ -286,7 +286,7 @@ int main() {
       render_target->Release();
       rtv->Release();
 
-      swapchain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
+      swapchain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0);
 
       swapchain->GetBuffer(0, IID_PPV_ARGS(&render_target));
       device->CreateRenderTargetView(render_target, 0, &rtv);

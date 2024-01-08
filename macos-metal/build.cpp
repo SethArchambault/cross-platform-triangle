@@ -10,6 +10,8 @@ enum {
     mode_none       = 0x0, 
     mode_help       = 0x1,
     mode_codeclap   = 0x2,
+    mode_nopoison     = 0x4,
+    mode_debug_hash = 0x8,
 };
 
 S32 command_run(Arena *arena, S32 modes);
@@ -23,6 +25,12 @@ int main(int Argc, char ** Argv) {
         }
         if(string_compare("help", Argv[Idx])) {
             modes |= mode_help; 
+        }
+        if(string_compare("nopoison", Argv[Idx])) {
+            modes |= mode_nopoison; 
+        }
+        if(string_compare("debug_hash", Argv[Idx])) {
+            modes |= mode_debug_hash; 
         }
     }
     const char str[] = "test";
@@ -42,12 +50,22 @@ S32 command_run(Arena *arena, S32 modes)
     if (modes & mode_help) {
         cmd = string_concat(arena, cmd, "Options:\n"); 
         cmd = string_concat(arena, cmd, "./build.cpp codeclap\n"); 
-        cmd = string_concat(arena, cmd, "  Run with codeclap"); 
+        cmd = string_concat(arena, cmd, "  Run with codeclap\n"); 
+        cmd = string_concat(arena, cmd, "./build.cpp debug_hash\n"); 
+        cmd = string_concat(arena, cmd, "  show debug hash messages\n"); 
+        cmd = string_concat(arena, cmd, "./build.cpp nopoison\n"); 
+        cmd = string_concat(arena, cmd, "  disable memory poisoning\n"); 
         string_print(cmd);
         return 0;
     }
     cmd = string_concat(arena, cmd, "time clang++ macos_main.cpp ");
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
+    if (!(modes & mode_nopoison)) {
+        cmd = string_concat(arena, cmd, "-DPOISON "); 
+    }
+    if (modes & mode_debug_hash) {
+        cmd = string_concat(arena, cmd, "-DDEBUG_HASH "); 
+    }
     cmd = string_concat(arena, cmd,
         "-fsanitize=undefined "
         "-fno-sanitize-recover=all " // crashes with message
@@ -64,7 +82,8 @@ S32 command_run(Arena *arena, S32 modes)
         cmd = string_concat(arena, cmd, 
             " && MallocNanoZone=0 codeclap ./temp/main"
         );
-    } else {
+    } 
+    else {
         cmd = string_concat(arena, cmd, 
             " && MallocNanoZone=0 ./temp/main"
         );

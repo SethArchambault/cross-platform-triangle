@@ -1,11 +1,8 @@
-//#include <sanitizer/asan_interface.h>
 #include <string.h> // memcpy
 
 String * string_alloc(Arena * arena, U64 size) {
     arena_alloc(arena, size + 64);
-    String * broken_str = (String *) arena->mem + arena->alloc_pos;
     String * str = (String *) (arena->mem + arena->alloc_pos);
-    //__asan_unpoison_memory_region(str, arena->alloc_pos + 64);
     str->size  = size;
     str->data  = arena->mem + arena->alloc_pos + 64;
     return str;
@@ -45,6 +42,15 @@ String * string_concat(Arena * arena, String *str1, const char * raw) {
     str3->size = str3_size;
     memcpy(str3->data, str1->data, str1->size);
     memcpy(str3->data + str1->size, raw, raw_size);
+    return str3;
+}
+
+String * string_concat(Arena * arena, String *str1, char raw) {
+    U64 str3_size = str1->size + 1;
+    String * str3 = string_alloc(arena, str3_size);
+    str3->size = str3_size;
+    memcpy(str3->data, str1->data, str1->size);
+    str3->data[str1->size] = (U8)raw;
     return str3;
 }
 

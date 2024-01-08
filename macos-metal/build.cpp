@@ -50,7 +50,6 @@ S32 command_run(Arena *arena, S32 modes)
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
     cmd = string_concat(arena, cmd,
         "-fsanitize=undefined "
-        //"-fsanitize-trap=undefined " // crashes, with no message
         "-fno-sanitize-recover=all " // crashes with message
         "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
         "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-value "
@@ -63,13 +62,16 @@ S32 command_run(Arena *arena, S32 modes)
     if(modes & mode_codeclap) {
         printf("codeclap active\n");
         cmd = string_concat(arena, cmd, 
-            " && MallocNanoZone=0 codeclap ./temp/main\0"
+            " && MallocNanoZone=0 codeclap ./temp/main"
         );
     } else {
         cmd = string_concat(arena, cmd, 
-            " && MallocNanoZone=0 ./temp/main\0"
+            " && MallocNanoZone=0 ./temp/main"
         );
     }
+
     string_print(cmd);
+
+    cmd = string_concat(arena, cmd, '\0');
     return system((const char *) cmd->data);
 }

@@ -34,7 +34,7 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
     public:
         SethMtkViewDelegate( MTL::Device* pDevice );
         virtual void drawInMTKView( MTK::View* pView ) override;
-        virtual void mouseMoved(NSEvent *) event override;
+//        virtual void mouseMoved(NSEvent *) event override;
 
     private:
         MTL::Device* _pDevice;
@@ -359,10 +359,12 @@ void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
     pool->release();
 }
 
+/*
 void SethMtkViewDelegate::mouseMoved(NSEvent * event) 
 {
     printf("mouse moved\n");
 }
+*/
 
 
 #pragma endregion ViewDelegate }

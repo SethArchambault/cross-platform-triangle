@@ -46,9 +46,10 @@ S32 command_run(Arena *arena, S32 modes)
         string_print(cmd);
         return 0;
     }
-    cmd = string_concat(arena, cmd, "clang++ macos_main.cpp ");
+    cmd = string_concat(arena, cmd, "time clang++ macos_main.cpp ");
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
     cmd = string_concat(arena, cmd,
+        "-fsanitize=undefined "
         "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
         "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-value "
         "-ferror-limit=4 "
@@ -60,11 +61,11 @@ S32 command_run(Arena *arena, S32 modes)
     if(modes & mode_codeclap) {
         printf("codeclap active\n");
         cmd = string_concat(arena, cmd, 
-            " && time MallocNanoZone=0 codeclap ./temp/main\0"
+            " && MallocNanoZone=0 codeclap ./temp/main\0"
         );
     } else {
         cmd = string_concat(arena, cmd, 
-            " && time MallocNanoZone=0 ./temp/main\0"
+            " && MallocNanoZone=0 ./temp/main\0"
         );
     }
     string_print(cmd);

@@ -11,8 +11,9 @@ pub fn build(b: *std.Build) void {
         "main.cpp",
     }, &.{
         "-g",
-        "-fsanitize=address",
-        "-static-libsan",
+        //"-fsanitize=address",
+        //"-fno-sanitize=undefined", // undefined behavior crash is hit otherwise..
+        //        "-static-libsan",
         "-std=c++20",
         "-Werror",
         "-Wall",
@@ -23,7 +24,7 @@ pub fn build(b: *std.Build) void {
         "-Wno-unused-parameter",
         "-Wno-deprecated-declarations",
         "-Wno-unused-value",
-        "-ferror-limit=4",
+        //        "-ferror-limit=4",
         "-O1",
         "-o temp/main",
     });

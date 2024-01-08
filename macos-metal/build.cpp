@@ -50,6 +50,8 @@ S32 command_run(Arena *arena, S32 modes)
     cmd = string_concat(arena, cmd, "-g -fsanitize=address -static-libsan ");
     cmd = string_concat(arena, cmd,
         "-fsanitize=undefined "
+        //"-fsanitize-trap=undefined " // crashes, with no message
+        "-fno-sanitize-recover=all " // crashes with message
         "-std=c++20 -Werror -Wall -Wextra -Wshadow -Wconversion "
         "-Wno-unused-variable -Wno-unused-parameter -Wno-deprecated-declarations -Wno-unused-value "
         "-ferror-limit=4 "

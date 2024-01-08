@@ -84,7 +84,7 @@ struct Arena {
 
 struct String {
     U64 size;
-    U64 *data;
+    U8 *data;
 };
 
 String * string_alloc(Arena * arena, U64 size);

@@ -247,7 +247,7 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
 
 }
 
-U8 *buffer_str_arr[BUFFER_MAX]; 
+U64 *buffer_str_arr[BUFFER_MAX]; 
 MTK::View* seth_view;
 MTL::RenderCommandEncoder* render_cmd_encoder;
 void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
@@ -299,7 +299,7 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     // buffers
         if(!_pVertexPositionsBuffer[buffer_idx]) {
 
-            buffer_str_arr[hash_idx] = (U8 *)id_str;
+            buffer_str_arr[hash_idx] = (U64 *)id_str;
             const size_t NumVertices = 3;
             simd::float3 positions[NumVertices] = {
                 {p1.x, p1.y, 0.0f}, 

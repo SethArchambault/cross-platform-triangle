@@ -5,9 +5,14 @@ pub fn build(b: *std.Build) void {
         .name = "main",
     });
     //exe.addIncludePath("includes");
+    //exe.addIncludeDir("includes");
+    exe.addIncludePath(.{ .path = "includes" });
     exe.addCSourceFiles(&.{
         "main.cpp",
     }, &.{
+        "-g",
+        "-fsanitize=address",
+        "-static-libsan",
         "-std=c++20",
         "-Werror",
         "-Wall",

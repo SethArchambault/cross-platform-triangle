@@ -60,5 +60,6 @@ windows/win_main.obj
 windows/win_main.pdb
 windows/vc140.pdb
 
-
+# zig
+zig-cache
 

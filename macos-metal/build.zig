@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
     }, &.{
         "-g",
         //"-fsanitize=address",
-        //"-fno-sanitize=undefined", // undefined behavior crash is hit otherwise..
+        "-fno-sanitize=undefined", // undefined behavior crash is hit otherwise..
         //        "-static-libsan",
         "-std=c++20",
         "-Werror",

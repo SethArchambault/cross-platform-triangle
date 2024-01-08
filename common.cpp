@@ -1,4 +1,4 @@
-#include <sanitizer/asan_interface.h>
+//#include <sanitizer/asan_interface.h>
 #include <string.h> // memcpy
 
 String * string_alloc(Arena * arena, U64 size) {

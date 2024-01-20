@@ -2,11 +2,11 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
-        .name = "main",
+        .name = "macos_main",
     });
     exe.addIncludePath(.{ .path = "includes" });
     exe.addCSourceFiles(&.{
-        "main.cpp",
+        "macos_main.cpp",
     }, &.{
         "-g",
         "-std=c++20",
@@ -21,7 +21,7 @@ pub fn build(b: *std.Build) void {
         "-Wno-unused-value",
         "-ferror-limit=4",
         "-O1",
-        "-o temp/main",
+        "-o temp/macos_main",
     });
     exe.linkLibC();
     exe.linkLibCpp();

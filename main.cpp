@@ -53,7 +53,7 @@ void draw_arrow(String * id_str, V2F32 pos, F32 width, F32 length, F32 turns, V3
 F32 rotation = 0.0;
 
 void game_mouse_move(S32 x, S32 y) {
-    rotation = (F32) x / 300.0f;
+    //rotation = (F32) x / 300.0f;
 }
 
 struct State {
@@ -72,6 +72,7 @@ S32 game_loop() {
         String *id_str = string_make(__s.arena, "basic_triangle", idx);
         draw_arrow(id_str, {idx*50.0f, idx*25.0f}, 50.0f, 70.0f, rotation+(F32)idx*0.1f, color);
     }
+    rotation += 1.0f;
     return 0;
 }
 

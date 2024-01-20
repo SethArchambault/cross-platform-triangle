@@ -13,13 +13,13 @@
 #include <MetalKit/MetalKit.hpp>
 
 #include <simd/simd.h>
-// TODO: move this file down, so it's closer to the files included, remove ../
+
 #define _USE_MATH_DEFINES
-#include "../../common.h"
-#include "../../platform_main.h"
-#include "../../macos_platform.cpp"
-#include "../../common.cpp"
-#include "../../main.cpp"
+#include "../common.h"
+#include "../platform_main.h"
+#include "../macos_platform.cpp"
+#include "../common.cpp"
+#include "../main.cpp"
 
 #pragma clang diagnostic pop
 

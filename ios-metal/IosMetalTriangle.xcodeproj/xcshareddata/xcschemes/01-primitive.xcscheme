@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "83ABBB2D2A12EFC300763796"
                BuildableName = "Triangle Crossplatform.app"
-               BlueprintName = "01-primitive"
+               BlueprintName = "ios_main"
                ReferencedContainer = "container:IosMetalTriangle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,7 +46,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "83ABBB2D2A12EFC300763796"
             BuildableName = "Triangle Crossplatform.app"
-            BlueprintName = "01-primitive"
+            BlueprintName = "ios_main"
             ReferencedContainer = "container:IosMetalTriangle.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

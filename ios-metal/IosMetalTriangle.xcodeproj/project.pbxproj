@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		83ABBB472A12F0BA00763796 /* 01-primitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A9C0A927349EB500932563 /* 01-primitive.cpp */; };
+		83ABBB472A12F0BA00763796 /* ios_main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A9C0A927349EB500932563 /* ios_main.cpp */; };
 		83ABBB482A12F0E400763796 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83ABBB232A12C74900763796 /* Metal.framework */; };
 		83ABBB492A12F0E400763796 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83ABBB222A12C74900763796 /* MetalKit.framework */; };
 		83ABBB4A2A12F0E900763796 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83ABBB282A12C75300763796 /* UIKit.framework */; };
@@ -18,7 +18,7 @@
 		71A9C07527349D4200932563 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		71A9C07727349D4500932563 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		71A9C07927349D5500932563 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		71A9C0A927349EB500932563 /* 01-primitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "01-primitive.cpp"; sourceTree = "<group>"; };
+		71A9C0A927349EB500932563 /* ios_main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ios_main.cpp; sourceTree = "<group>"; };
 		71A9C18B2734A42900932563 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		72CBBD399B025FAB0CA05C0D /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		83ABBB162A12C73000763796 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -48,8 +48,6 @@
 		40B3313127F3B63B0029F74E /* learn-metal */ = {
 			isa = PBXGroup;
 			children = (
-				71A9C0A827349EB500932563 /* 01-primitive */,
-				83ABBB092A12C72F00763796 /* ios-shared */,
 			);
 			path = "learn-metal";
 			sourceTree = "<group>";
@@ -57,6 +55,8 @@
 		71A9C05627349B9000932563 = {
 			isa = PBXGroup;
 			children = (
+				71A9C0A927349EB500932563 /* ios_main.cpp */,
+				83ABBB092A12C72F00763796 /* ios-shared */,
 				40B3313127F3B63B0029F74E /* learn-metal */,
 				71A9C06027349B9000932563 /* Products */,
 				71A9C07427349D4100932563 /* Frameworks */,
@@ -86,14 +86,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		71A9C0A827349EB500932563 /* 01-primitive */ = {
-			isa = PBXGroup;
-			children = (
-				71A9C0A927349EB500932563 /* 01-primitive.cpp */,
-			);
-			path = "01-primitive";
-			sourceTree = "<group>";
-		};
 		7AEFB0BFB35CB540726CA917 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,9 +107,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		83ABBB2D2A12EFC300763796 /* 01-primitive */ = {
+		83ABBB2D2A12EFC300763796 /* ios_main */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83ABBB442A12EFC400763796 /* Build configuration list for PBXNativeTarget "01-primitive" */;
+			buildConfigurationList = 83ABBB442A12EFC400763796 /* Build configuration list for PBXNativeTarget "ios_main" */;
 			buildPhases = (
 				83ABBB2A2A12EFC300763796 /* Sources */,
 				83ABBB2B2A12EFC300763796 /* Frameworks */,
@@ -127,7 +119,7 @@
 			);
 			dependencies = (
 			);
-			name = "01-primitive";
+			name = ios_main;
 			productName = "01-primitive";
 			productReference = 83ABBB2E2A12EFC300763796 /* Triangle Crossplatform.app */;
 			productType = "com.apple.product-type.application";
@@ -160,7 +152,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83ABBB2D2A12EFC300763796 /* 01-primitive */,
+				83ABBB2D2A12EFC300763796 /* ios_main */,
 			);
 		};
 /* End PBXProject section */
@@ -180,7 +172,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83ABBB472A12F0BA00763796 /* 01-primitive.cpp in Sources */,
+				83ABBB472A12F0BA00763796 /* ios_main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,7 +323,7 @@
 					"metal-cpp",
 					"metal-cpp-extensions",
 				);
-				INFOPLIST_FILE = "learn-metal/ios-shared/Info.plist";
+				INFOPLIST_FILE = "ios-shared/Info.plist";
 				INFOPLIST_KEY_MetalCaptureEnabled = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -366,7 +358,7 @@
 					"metal-cpp",
 					"metal-cpp-extensions",
 				);
-				INFOPLIST_FILE = "learn-metal/ios-shared/Info.plist";
+				INFOPLIST_FILE = "ios-shared/Info.plist";
 				INFOPLIST_KEY_MetalCaptureEnabled = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -398,7 +390,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83ABBB442A12EFC400763796 /* Build configuration list for PBXNativeTarget "01-primitive" */ = {
+		83ABBB442A12EFC400763796 /* Build configuration list for PBXNativeTarget "ios_main" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83ABBB452A12EFC400763796 /* Debug */,

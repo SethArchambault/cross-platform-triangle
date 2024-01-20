@@ -34,7 +34,6 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
     public:
         SethMtkViewDelegate( MTL::Device* pDevice );
         virtual void drawInMTKView( MTK::View* pView ) override;
-//        virtual void mouseMoved(NSEvent *) event override;
 
     private:
         MTL::Device* _pDevice;
@@ -43,7 +42,6 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
 class SethDelegate : public NS::ApplicationDelegate
 {
     public:
-        //~SethDelegate();
 
         NS::Menu* createMenuBar();
 
@@ -78,20 +76,8 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-
-
 #pragma mark - AppDelegate
 #pragma region AppDelegate {
-
-/* not needed
-SethDelegate::~SethDelegate()
-{
-    _pMtkView->release();
-    _pWindow->release();
-    _pDevice->release();
-    delete _pViewDelegate;
-}
-*/
 
 /// :menubar
 NS::Menu* SethDelegate::createMenuBar()
@@ -172,10 +158,8 @@ bool SethDelegate::applicationShouldTerminateAfterLastWindowClosed( NS::Applicat
 #pragma region ViewDelegate {
 
 SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
-: MTK::ViewDelegate()
-, _pDevice( pDevice->retain() )
+    : MTK::ViewDelegate() , _pDevice( pDevice->retain() )
 {
-
     arena = arena_init();
 
     /// old renderer
@@ -292,35 +276,33 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
         }
     }
 
-
     S32 buffer_idx = hash_idx;
 
-
     // buffers
-        if(!_pVertexPositionsBuffer[buffer_idx]) {
+    if(!_pVertexPositionsBuffer[buffer_idx]) {
 
-            buffer_str_arr[hash_idx] = (U64 *)id_str;
-            const size_t NumVertices = 3;
-            simd::float3 positions[NumVertices] = {
-                {p1.x, p1.y, 0.0f}, 
-                {p3.x, p3.y, 0.0f},
-                {p2.x, p2.y, 0.0f},
-            };
+        buffer_str_arr[hash_idx] = (U64 *)id_str;
+        const size_t NumVertices = 3;
+        simd::float3 positions[NumVertices] = {
+            {p1.x, p1.y, 0.0f}, 
+            {p3.x, p3.y, 0.0f},
+            {p2.x, p2.y, 0.0f},
+        };
 
-            simd::float3 colors[NumVertices] = {
-                {color.r, color.g, color.b},
-                {color.r, color.g, color.b},
-                {color.r, color.g, color.b},
-            };
-            _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
-            _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
+        simd::float3 colors[NumVertices] = {
+            {color.r, color.g, color.b},
+            {color.r, color.g, color.b},
+            {color.r, color.g, color.b},
+        };
+        _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
+        _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
 
-            memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
-            memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
+        memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
+        memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
 
-            _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
-            _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
-        } // buffer
+        _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
+        _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
+    } // buffer
 
     /// draw
     {
@@ -331,16 +313,6 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     }
 }
 
-/* not needed 
-SethMtkViewDelegate::~SethMtkViewDelegate()
-{
-    _pVertexPositionsBuffer->release();
-    _pVertexColorsBuffer->release();
-    render_pipeline_state->release();
-    _pCommandQueue->release();
-    _pDevice->release();
-}
-*/
 void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
 {
     seth_pDevice = _pDevice;
@@ -351,21 +323,15 @@ void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
     MTL::RenderPassDescriptor* render_pass_desc = seth_view ->currentRenderPassDescriptor();
     render_cmd_encoder = command_buffer->renderCommandEncoder( render_pass_desc );
     render_cmd_encoder->setRenderPipelineState( render_pipeline_state );
+
     game_loop();
+
     render_cmd_encoder->endEncoding();
     command_buffer->presentDrawable( seth_view->currentDrawable() );
     command_buffer->commit();
 
     pool->release();
 }
-
-/*
-void SethMtkViewDelegate::mouseMoved(NSEvent * event) 
-{
-    printf("mouse moved\n");
-}
-*/
-
 
 #pragma endregion ViewDelegate }
 

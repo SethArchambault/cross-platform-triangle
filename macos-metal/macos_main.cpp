@@ -22,7 +22,7 @@
 
 #pragma region Declarations {
 
-    // previously in the private below
+// previously in the private below
 MTL::RenderPipelineState* render_pipeline_state;
 MTL::CommandQueue* _pCommandQueue;
 MTL::Buffer* _pVertexPositionsBuffer[BUFFER_MAX];
@@ -42,8 +42,6 @@ class SethMtkViewDelegate : public MTK::ViewDelegate
 class SethDelegate : public NS::ApplicationDelegate
 {
     public:
-        //~SethDelegate();
-
         NS::Menu* createMenuBar();
 
         virtual void applicationWillFinishLaunching( NS::Notification* pNotification ) override;
@@ -77,20 +75,8 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-
-
 #pragma mark - AppDelegate
 #pragma region AppDelegate {
-
-/* not needed
-SethDelegate::~SethDelegate()
-{
-    _pMtkView->release();
-    _pWindow->release();
-    _pDevice->release();
-    delete _pViewDelegate;
-}
-*/
 
 /// :menubar
 NS::Menu* SethDelegate::createMenuBar()
@@ -174,10 +160,8 @@ SethMtkViewDelegate::SethMtkViewDelegate( MTL::Device* pDevice )
 : MTK::ViewDelegate()
 , _pDevice( pDevice->retain() )
 {
-
     arena = arena_init();
 
-    /// old renderer
     _pCommandQueue = _pDevice->newCommandQueue();
     /// Shader
     {
@@ -291,35 +275,33 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
         }
     }
 
-
     S32 buffer_idx = hash_idx;
 
-
     // buffers
-        if(!_pVertexPositionsBuffer[buffer_idx]) {
+    if(!_pVertexPositionsBuffer[buffer_idx]) {
 
-            buffer_str_arr[hash_idx] = (U8 *)id_str;
-            const size_t NumVertices = 3;
-            simd::float3 positions[NumVertices] = {
-                {p1.x, p1.y, 0.0f}, 
-                {p3.x, p3.y, 0.0f},
-                {p2.x, p2.y, 0.0f},
-            };
+        buffer_str_arr[hash_idx] = (U8 *)id_str;
+        const size_t NumVertices = 3;
+        simd::float3 positions[NumVertices] = {
+            {p1.x, p1.y, 0.0f}, 
+            {p3.x, p3.y, 0.0f},
+            {p2.x, p2.y, 0.0f},
+        };
 
-            simd::float3 colors[NumVertices] = {
-                {color.r, color.g, color.b},
-                {color.r, color.g, color.b},
-                {color.r, color.g, color.b},
-            };
-            _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
-            _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
+        simd::float3 colors[NumVertices] = {
+            {color.r, color.g, color.b},
+            {color.r, color.g, color.b},
+            {color.r, color.g, color.b},
+        };
+        _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
+        _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
 
-            memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
-            memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
+        memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
+        memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
 
-            _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
-            _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
-        } // buffer
+        _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
+        _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
+    } // buffer
 
     /// draw
     {
@@ -347,7 +329,7 @@ void SethMtkViewDelegate::drawInMTKView( MTK::View* view)
     NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
     MTL::CommandBuffer* command_buffer = _pCommandQueue->commandBuffer();
-    MTL::RenderPassDescriptor* render_pass_desc = seth_view ->currentRenderPassDescriptor();
+    MTL::RenderPassDescriptor* render_pass_desc = seth_view->currentRenderPassDescriptor();
     render_cmd_encoder = command_buffer->renderCommandEncoder( render_pass_desc );
     render_cmd_encoder->setRenderPipelineState( render_pipeline_state );
 

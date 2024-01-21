@@ -278,9 +278,7 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     S32 buffer_idx = hash_idx;
 
     // buffers
-    if(!_pVertexPositionsBuffer[buffer_idx]) {
-
-        buffer_str_arr[hash_idx] = (U8 *)id_str;
+    {
         const size_t NumVertices = 3;
         simd::float3 positions[NumVertices] = {
             {p1.x, p1.y, 0.0f}, 
@@ -293,15 +291,21 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
             {color.r, color.g, color.b},
             {color.r, color.g, color.b},
         };
-        _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
-        _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
+        if(!_pVertexPositionsBuffer[buffer_idx]) {
+            // new buffer
+
+            buffer_str_arr[hash_idx] = (U8 *)id_str;
+            _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeManaged );
+            _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeManaged );
+        }
 
         memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
         memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
 
+        // updated buffer
         _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
         _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
-    } // buffer
+    }// end buffers
 
     /// draw
     {

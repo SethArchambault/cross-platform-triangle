@@ -71,7 +71,7 @@ S32 game_loop() {
     V3F32 color = {{200.0}, {0.0}, {150.0}};
     for (S32 idx = 0; idx < 50; idx++) {
         String *id_str = string_make(__s.arena, "basic_triangle", idx);
-        draw_arrow(id_str, {idx*50.0f, idx*25.0f}, 50.0f, 70.0f, __s.rotation+(F32)idx*0.1f, color);
+        draw_arrow(id_str, {idx*15.0f, idx*50.0f}, 50.0f, 70.0f, __s.rotation+(F32)idx*0.1f, color);
     }
     __s.rotation += 0.01f ;
     if (__s.rotation > 2.0f) {

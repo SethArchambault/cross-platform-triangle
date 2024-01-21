@@ -138,8 +138,8 @@ MyMTKViewDelegate::MyMTKViewDelegate( MTL::Device* pDevice )
             {
                 v2f o;
                 o.position = float4( positions[ vertexId ], 1.0 );
-                o.position.x /= 1000; // pixel to percent
-                o.position.y /= 600;
+                o.position.x /= 300; // pixel to percent
+                o.position.y /= 1000;
                 o.position.xy *= 2; // scale
                 o.position.xy -= 1; // adjust
                 o.position.y *= -1; // flip
@@ -231,31 +231,35 @@ void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32
     }
 
     S32 buffer_idx = hash_idx;
-
-    if(!_pVertexPositionsBuffer[buffer_idx]) {
-
-        buffer_str_arr[hash_idx] = (U8 *)id_str;
+    { // buffer
+        
         const size_t NumVertices = 3;
         simd::float3 positions[NumVertices] = {
-            {p1.x, p1.y, 0.0f}, 
+            {p1.x, p1.y, 0.0f},
             {p3.x, p3.y, 0.0f},
             {p2.x, p2.y, 0.0f},
         };
-
+        
         simd::float3 colors[NumVertices] = {
             {color.r, color.g, color.b},
             {color.r, color.g, color.b},
             {color.r, color.g, color.b},
         };
-        _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeShared );
-        _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeShared );
-
+    
+        if(!_pVertexPositionsBuffer[buffer_idx]) {
+            
+            buffer_str_arr[hash_idx] = (U8 *)id_str;
+             _pVertexPositionsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(positions), MTL::ResourceStorageModeShared );
+            _pVertexColorsBuffer[buffer_idx] = seth_pDevice->newBuffer( sizeof(colors), MTL::ResourceStorageModeShared );
+            
+        }
         memcpy( _pVertexPositionsBuffer[buffer_idx]->contents(), positions, sizeof(positions));
         memcpy( _pVertexColorsBuffer[buffer_idx]->contents(), colors, sizeof(colors));
-
+        
         _pVertexPositionsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexPositionsBuffer[buffer_idx]->length() ) );
         _pVertexColorsBuffer[buffer_idx]->didModifyRange( NS::Range::Make( 0, _pVertexColorsBuffer[buffer_idx]->length() ) );
-    }
+
+    }// buffer
 
     /// draw
     {

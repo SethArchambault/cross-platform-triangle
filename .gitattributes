@@ -1,1 +1,2 @@
- * text=auto eol=lf
+ *          text=auto eol=lf
+ *.hpp      text eol=lf

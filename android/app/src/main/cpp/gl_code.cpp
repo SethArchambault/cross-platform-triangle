@@ -168,9 +168,6 @@ JNIEXPORT void JNICALL Java_com_seth_triangle_GL2JNILib_step(JNIEnv* env,
   glUseProgram(gProgram);
   checkGlError("glUseProgram");
 
-
-
-
   game_loop();
 }
 // seth convert this to andorid

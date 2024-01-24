@@ -37,8 +37,8 @@ auto gVertexShader =
     "void main() {\n"
     "  gl_Position = vPosition;\n"
     "  gl_Position.xy *= 2.0;\n"
-    "  gl_Position.x /= 1000.0;\n"
-    "  gl_Position.y /= 600.0;\n"
+    "  gl_Position.x /= 300.0;\n"
+    "  gl_Position.y /= 800.0;\n"
     "  gl_Position.xy -= 1.0;\n"
     "  gl_Position.y *= -1.0;\n"
     "}\n";
@@ -174,7 +174,7 @@ JNIEXPORT void JNICALL Java_com_seth_triangle_GL2JNILib_step(JNIEnv* env,
 void * _pVertexPositionsBuffer[BUFFER_MAX];
 
 void platform_draw_triangle(String * id_str, V2F32 p1, V2F32 p2, V2F32 p3, V3F32 color) {
-    LOGI("test");
+    //LOGI("test");
 
 
 

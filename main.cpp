@@ -77,7 +77,7 @@ S32 game_loop() {
     if (__s.rotation > 2.0f) {
         __s.rotation = 0.0f;
     }
-    printf("rotation %f\n", __s.rotation);
+    //printf("rotation %f\n", __s.rotation);
     return 0;
 }
 
